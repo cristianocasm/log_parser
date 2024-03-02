@@ -17,7 +17,7 @@ class LogParserJob < ApplicationJob
         when NEW_PLAYER
           record_player($1, games_data, current_game)
         when KILLER_VICTIM
-          record_kill($1, $2, games_data, current_game)
+          record_kill($1, $2, $3, games_data, current_game)
         end
       end
     end
@@ -29,8 +29,8 @@ class LogParserJob < ApplicationJob
     games_data["game_#{current_game}"] = {
       "total_kills": 0,
       "players": Set.new,
-      "kills": {}
-      # TODO: "kills_by_means": {...}
+      "kills": {},
+      "kills_by_means": Hash.new { |hsh, key| hsh[key] = 0 }
     }
   end
 
@@ -39,9 +39,10 @@ class LogParserJob < ApplicationJob
     games_data["game_#{current_game}"][:kills][player_name] ||= 0
   end
 
-  def record_kill(killer, victim, games_data, current_game)
+  def record_kill(killer, victim, mean, games_data, current_game)
     games_data["game_#{current_game}"][:kills][killer] += 1 unless killer == "<world>"
     games_data["game_#{current_game}"][:kills][victim] -= 1 if killer == "<world>"
+    games_data["game_#{current_game}"][:kills_by_means][mean] += 1
     games_data["game_#{current_game}"][:total_kills] += 1
   end
 end
