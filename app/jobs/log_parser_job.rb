@@ -1,9 +1,9 @@
 class LogParserJob < ApplicationJob
   queue_as :default
 
-  INIT_GAME = /^\s.\d+:\d{2} InitGame: /
-  NEW_PLAYER = /^\s.\d+:\d{2} ClientUserinfoChanged: \d+ n\\(.*?)\\/
-  KILLER_VICTIM = /^\s.\d+:\d{2} Kill: \d+ \d+ \d+: (.+) killed (.+) by MOD_[A-Z_]+$/
+  INIT_GAME = /^\s*\d+:\d{2} InitGame: /
+  NEW_PLAYER = /^\s*\d+:\d{2} ClientUserinfoChanged: \d+ n\\(.*?)\\/
+  KILLER_VICTIM = /^\s*\d+:\d{2} Kill: \d+ \d+ \d+: (.+) killed (.+) by (MOD_[A-Z_]+)$/
 
   def perform(import)
     games_data = {}.with_indifferent_access
