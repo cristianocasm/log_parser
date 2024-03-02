@@ -1,5 +1,5 @@
 class Import < ApplicationRecord
-  has_one_attached :log_file
+  include HasOneAttachedLogFile
 
   has_many :matches, dependent: :destroy
 
