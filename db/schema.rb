@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_02_153207) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_02_155215) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,12 +42,40 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_02_153207) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "cache_reports", force: :cascade do |t|
+    t.bigint "match_id", null: false
+    t.jsonb "stats", default: "{}", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["match_id"], name: "index_cache_reports_on_match_id"
+  end
+
   create_table "imports", force: :cascade do |t|
     t.string "status", limit: 7
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
+  create_table "kills", force: :cascade do |t|
+    t.bigint "match_id", null: false
+    t.string "killer", null: false
+    t.string "victim", null: false
+    t.string "means", limit: 40
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["match_id"], name: "index_kills_on_match_id"
+  end
+
+  create_table "matches", force: :cascade do |t|
+    t.bigint "import_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["import_id"], name: "index_matches_on_import_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "cache_reports", "matches"
+  add_foreign_key "kills", "matches"
+  add_foreign_key "matches", "imports"
 end
