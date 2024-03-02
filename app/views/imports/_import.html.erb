@@ -1,0 +1,12 @@
+<div id="<%= dom_id import %>">
+  <p>
+    <strong>Log file:</strong>
+    <%= link_to import.log_file.filename, import.log_file if import.log_file.attached? %>
+  </p>
+
+  <p>
+    <strong>Status:</strong>
+    <%= import.status %>
+  </p>
+
+</div>
