@@ -1,6 +1,8 @@
 class LogParserJob < ApplicationJob
   queue_as :default
 
+  around_perform :update_status
+
   INIT_GAME = /^\s*\d+:\d{2} InitGame: /
   NEW_PLAYER = /^\s*\d+:\d{2} ClientUserinfoChanged: \d+ n\\(.*?)\\/
   KILLER_VICTIM = /^\s*\d+:\d{2} Kill: \d+ \d+ \d+: (.+) killed (.+) by (MOD_[A-Z_]+)$/
@@ -24,6 +26,16 @@ class LogParserJob < ApplicationJob
   end
 
   private
+
+  def update_status
+    import = self.arguments.first
+
+    import.update_column :status, Import::PARSING
+    yield
+    import.update_column :status, Import::PARSED
+  rescue StandardError => e
+    import.update_columns status: Import::ERROR, error_message: e.message
+  end
 
   def record_start(games_data, current_game)
     games_data["game_#{current_game}"] = {
