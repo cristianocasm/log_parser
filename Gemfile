@@ -66,5 +66,6 @@ group :test do
   gem "selenium-webdriver"
 end
 
-# Database-backed Active Job backend
-gem "solid_queue", "~> 0.2.1"
+# Backgroud jobs
+gem "solid_queue", "~> 0.2.1" # Database-backed Active Job backend
+gem "mission_control-jobs", "~> 0.1.1" # Dashboard and Active Job extensions to operate and troubleshoot background jobs
