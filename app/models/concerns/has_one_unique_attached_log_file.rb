@@ -1,9 +1,12 @@
-module HasOneAttachedLogFile
+module HasOneUniqueAttachedLogFile
   extend ActiveSupport::Concern
 
   included do
     has_one_attached :log_file
+
     validate :unique_log_file
+
+    after_create_commit :parse_log_file
 
     private
 
@@ -11,6 +14,10 @@ module HasOneAttachedLogFile
       return unless self.class.file_alreay_imported?(self.log_file.checksum)
 
       self.errors.add :log_file, 'already imported'
+    end
+
+    def parse_log_file
+      LogParserJob.perform_later self
     end
   end
 
