@@ -51,7 +51,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_02_155215) do
   end
 
   create_table "imports", force: :cascade do |t|
-    t.string "status", limit: 7
+    t.string "status", limit: 7, default: "pending", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
