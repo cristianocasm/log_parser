@@ -6,6 +6,8 @@ class Import < ApplicationRecord
   PARSED = 'parsed'
   ERROR = 'error'
 
+  broadcasts_to -> (import) { import }
+
   has_many :matches, dependent: :destroy
 
   validates :status, presence: true, inclusion: {
