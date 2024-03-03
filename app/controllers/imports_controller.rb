@@ -1,9 +1,16 @@
 class ImportsController < ApplicationController
+  around_action :skip_bullet,
+    if: -> { params[:action] == 'show' && request.referrer == new_import_url }
+
   before_action :set_import, only: %i[ show destroy ]
+
+  INCLUDES_PER_ACTION = {
+    show: {matches: :cache_report}
+  }.with_indifferent_access
 
   # GET /imports or /imports.json
   def index
-    @imports = Import.all
+    @imports = Import.includes(matches: :cache_report).all
   end
 
   # GET /imports/1 or /imports/1.json
@@ -43,7 +50,8 @@ class ImportsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_import
-      @import = Import.find(params[:id])
+      @import = Import.includes(INCLUDES_PER_ACTION[params[:action]]).
+        find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
