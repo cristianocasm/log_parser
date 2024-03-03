@@ -47,9 +47,10 @@ gem "bootsnap", require: false
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri mswin mswin64 mingw x64_mingw ]
-  gem 'bullet', "~> 7.1.6" # help to kill N+1 queries and unused eager loading
-  gem 'rspec-rails', '~> 6.1.1' # RSpec for Rails 6+
-  gem 'shoulda-matchers', '~> 6.0' # Simple one-liner tests for common Rails functionality
+  gem "bullet", "~> 7.1.6" # help to kill N+1 queries and unused eager loading
+  gem "rspec-rails", "~> 6.1.1" # RSpec for Rails 6+
+  gem "shoulda-matchers", "~> 6.0" # Simple one-liner tests for common Rails functionality
+  gem "factory_bot_rails", "~> 6.4.3" # Factory Bot ♥ Rails
 end
 
 group :development do
