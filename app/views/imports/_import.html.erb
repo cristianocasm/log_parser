@@ -9,8 +9,13 @@
     <%= import.status %>
   </p>
 
-  <% import.matches.each_with_index do |match, i| %>
-    <pre><%= JSON.pretty_generate({"game_#{i+1}" => match.cache_report&.stats}) %></pre>
+  <% if import.matches.exists? %>
+    <details open="open">
+      <summary>Report</summary>
+      <% import.matches.each_with_index do |match, i| %>
+        <pre><%= JSON.pretty_generate({"game_#{i+1}" => match.cache_report&.stats}) %></pre>
+      <% end %>
+    </details>
   <% end %>
 
 </div>

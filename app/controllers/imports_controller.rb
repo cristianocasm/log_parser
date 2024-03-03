@@ -1,5 +1,5 @@
 class ImportsController < ApplicationController
-  before_action :set_import, only: %i[ show edit update destroy ]
+  before_action :set_import, only: %i[ show destroy ]
 
   # GET /imports or /imports.json
   def index
@@ -15,10 +15,6 @@ class ImportsController < ApplicationController
     @import = Import.new
   end
 
-  # GET /imports/1/edit
-  def edit
-  end
-
   # POST /imports or /imports.json
   def create
     @import = Import.new(import_params)
@@ -29,19 +25,6 @@ class ImportsController < ApplicationController
         format.json { render :show, status: :created, location: @import }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @import.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # PATCH/PUT /imports/1 or /imports/1.json
-  def update
-    respond_to do |format|
-      if @import.update(import_params)
-        format.html { redirect_to import_url(@import), notice: "Import was successfully updated." }
-        format.json { render :show, status: :ok, location: @import }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @import.errors, status: :unprocessable_entity }
       end
     end
