@@ -8,21 +8,22 @@ class LogParserJob < ApplicationJob
   KILLER_VICTIM = /^\s*\d+:\d{2} Kill: \d+ \d+ \d+: (.+) killed (.+) by (MOD_[A-Z_]+)$/
 
   def perform(import)
-    current_game = 0
     match = nil
     stats = nil
 
-    import.log_file.open do |file| # downloads file
-      file.each_line do |line|     # reads file line by line so that RAM doesn't explode
-        case line
-        when INIT_GAME
-          match.create_cache_report!(stats:) if match.present?
-          match = import.matches.create!
-          stats = build_stats
-        when NEW_PLAYER
-          record_player($1, stats)
-        when KILLER_VICTIM
-          record_kill($1, $2, $3, match, stats)
+    ApplicationRecord.transaction do
+      import.log_file.open do |file| # downloads file
+        file.each_line do |line|     # reads file line by line so that RAM doesn't explode
+          case line
+          when INIT_GAME
+            match.create_cache_report!(stats:) if match.present?
+            match = import.matches.create!
+            stats = build_stats
+          when NEW_PLAYER
+            record_player($1, stats)
+          when KILLER_VICTIM
+            record_kill($1, $2, $3, match, stats)
+          end
         end
       end
     end
