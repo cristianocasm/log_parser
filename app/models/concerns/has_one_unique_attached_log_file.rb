@@ -4,7 +4,7 @@ module HasOneUniqueAttachedLogFile
   included do
     has_one_attached :log_file
 
-    validate :unique_log_file
+    validate :unique_log_file, on: :create
 
     after_create_commit :parse_log_file
 
