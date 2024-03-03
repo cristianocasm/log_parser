@@ -8,18 +8,21 @@ class LogParserJob < ApplicationJob
   KILLER_VICTIM = /^\s*\d+:\d{2} Kill: \d+ \d+ \d+: (.+) killed (.+) by (MOD_[A-Z_]+)$/
 
   def perform(import)
-    games_data = {}.with_indifferent_access
     current_game = 0
+    match = nil
+    stats = nil
 
     import.log_file.open do |file| # downloads file
       file.each_line do |line|     # reads file line by line so that RAM doesn't explode
         case line
         when INIT_GAME
-          record_start(games_data, current_game += 1)
+          match.create_cache_report!(stats:) if match.present?
+          match = import.matches.create!
+          stats = build_stats
         when NEW_PLAYER
-          record_player($1, games_data, current_game)
+          record_player($1, stats)
         when KILLER_VICTIM
-          record_kill($1, $2, $3, games_data, current_game)
+          record_kill($1, $2, $3, match, stats)
         end
       end
     end
@@ -30,15 +33,15 @@ class LogParserJob < ApplicationJob
   def update_status
     import = self.arguments.first
 
-    import.update_attribute :status, Import::PARSING
+    import.update! status: Import::PARSING
     yield
-    import.update_attribute :status, Import::PARSED
+    import.update! status: Import::PARSED
   rescue StandardError => e
-    import.update_attributes status: Import::ERROR, error_message: e.message
+    import.update! status: Import::ERROR, error_message: e.message
   end
 
-  def record_start(games_data, current_game)
-    games_data["game_#{current_game}"] = {
+  def build_stats
+    {
       "total_kills": 0,
       "players": Set.new,
       "kills": {},
@@ -46,15 +49,17 @@ class LogParserJob < ApplicationJob
     }
   end
 
-  def record_player(player_name, games_data, current_game)
-    games_data["game_#{current_game}"][:players] << player_name
-    games_data["game_#{current_game}"][:kills][player_name] ||= 0
+  def record_player(player_name, stats)
+    stats[:players] << player_name
+    stats[:kills][player_name] ||= 0
   end
 
-  def record_kill(killer, victim, mean, games_data, current_game)
-    games_data["game_#{current_game}"][:kills][killer] += 1 unless killer == "<world>"
-    games_data["game_#{current_game}"][:kills][victim] -= 1 if killer == "<world>"
-    games_data["game_#{current_game}"][:kills_by_means][mean] += 1
-    games_data["game_#{current_game}"][:total_kills] += 1
+  def record_kill(killer, victim, means, match, stats)
+    stats[:kills][killer] += 1 unless killer == "<world>"
+    stats[:kills][victim] -= 1 if killer == "<world>"
+    stats[:kills_by_means][means] += 1
+    stats[:total_kills] += 1
+
+    match.kills.create!(killer:, victim:, means:)
   end
 end
