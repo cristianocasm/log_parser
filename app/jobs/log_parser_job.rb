@@ -3,8 +3,8 @@ class LogParserJob < ApplicationJob
 
   around_perform :update_status
 
-  def perform(import)
-    Parser.call(import)
+  def perform(*args)
+    Parser.call(*args)
   end
 
   private
