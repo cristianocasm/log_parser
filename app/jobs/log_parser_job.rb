@@ -30,11 +30,11 @@ class LogParserJob < ApplicationJob
   def update_status
     import = self.arguments.first
 
-    import.update_column :status, Import::PARSING
+    import.update_attribute :status, Import::PARSING
     yield
-    import.update_column :status, Import::PARSED
+    import.update_attribute :status, Import::PARSED
   rescue StandardError => e
-    import.update_columns status: Import::ERROR, error_message: e.message
+    import.update_attributes status: Import::ERROR, error_message: e.message
   end
 
   def record_start(games_data, current_game)
