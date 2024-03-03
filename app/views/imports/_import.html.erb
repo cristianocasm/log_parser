@@ -9,4 +9,12 @@
     <%= import.status %>
   </p>
 
+  <p>
+    <% import.matches.each do |match| %>
+      <% match.cache_report.each do |cache| %>
+        <%= cache.stats %>
+      <% end %>
+    <% end %>
+  </p>
+
 </div>
